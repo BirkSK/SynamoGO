@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="https://i.ibb.co/25CC314/S-4.png">
+    <title>Synamo GO │ Vejr</title>
+    <style>
+        /* Add some basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 36px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        #searchForm {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 100px);
+            padding: 15px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 20px 0 0 20px;
+            outline: none;
+        }
+        
+        button, a.home-btn { /* Added 'a.home-btn' selector for the Home button */
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #4d4d4d;
+            color: #fff;
+            border: none;
+            border-radius: 5px; /* Modified border-radius for consistency */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none; /* Remove underline from the anchor tag */
+            display: inline-block; /* Ensure anchor tag behaves like a button */
+        }
+
+        button:hover, a.home-btn:hover { /* Modified selector for hover effect */
+            background-color: #353436;
+        }
+
+        #results {
+            margin-top: 20px;
+        }
+
+        .result {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f3f3f3;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .result h3 {
+            margin-bottom: 10px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .result p {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .result a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .result a:hover {
+            text-decoration: underline;
+        }
+
+        .branding-bubbles {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .branding-bubble {
+            width: 60px;
+            height: 60px;
+            background-color: #4d4d4d;
+            border-radius: 50%;
+            margin: 0 10px;
+            animation: bubble-float 3s ease-in-out infinite;
+        }
+
+        @keyframes bubble-float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        .logo {
+            display: block;
+            margin: 0 auto;
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+
+        .calculator-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .calculator-btn:hover {
+            background-color: #218838;
+        }
+
+
+        footer {
+            text-align: center;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="home-btn">Hjem</a> <!-- Home button added with the 'home-btn' class -->
+       <a href="https://birkpb.github.io/SynamoGO/">
+            <img class="logo" src="https://i.ibb.co/25CC314/S-4.png" alt="Logo">
+        </a>
+
+        <div id="searchForm">
+            <input type="text" id="searchInput" placeholder="Skriv en By">
+            <button onclick="search()">Søg</button>
+        </div>
+
+        <div id="results"></div>
+
+
+        <div class="branding-bubbles">
+            <div class="branding-bubble"></div>
+            <div class="branding-bubble"></div>
+            <div class="branding-bubble"></div>
+        </div>
+    </div>
+
+    <script>
+        function search() {
+            var city = document.getElementById("searchInput").value;
+
+            // Make a request to OpenWeatherMap API
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=61bb37c94fcf7a18c2e14d3c2b186df9&units=metric`)
+                .then(response => response.json())
+                .then(data => {
+                    // Display the weather information on the page
+                    var resultsDiv = document.getElementById("results");
+
+                    // Clear previous results
+                    resultsDiv.innerHTML = "";
+
+                    // Check if data is valid
+                    if (data.cod !== 200) {
+                        resultsDiv.innerHTML = "<p>City not found</p>";
+                        return;
+                    }
+
+                    // Append new result
+                    var result = document.createElement("div");
+                    result.classList.add("result");
+                    result.innerHTML = `
+                        <h3>${data.name}, ${data.sys.country}</h3>
+                        <p>Vejr: ${data.weather[0].description}</p>
+                        <p>Temperatur: ${data.main.temp}°C</p>
+                        <p>Luftfugtighed: ${data.main.humidity}%</p>
+                        <p>Føles som: ${data.main.feels_like}°C</p>
+                        <p>Sidst opdateret: ${new Date(data.dt * 1000).toLocaleString()}</p>
+                    `;
+                    resultsDiv.appendChild(result);
+                })
+                .catch(error => console.log(error));
+        }
+    </script>
+        <footer>&copy; Copyright 2024 Birk Breinholm</footer>
+</body>
+</html>
